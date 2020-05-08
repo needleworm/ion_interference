@@ -86,7 +86,7 @@ class Exp:
         header, data = csv_into_array(filename)
         for i in range(len(self.equation)):
             data[:, i] = self.equation[i].calculate(data[:, i])
-        np.savetxt("converted_" + filename, data, delimiter=", ", header=header)
+        np.savetxt("converted_" + filename, data, delimiter=", ", header=str(header))
 
 
 class ExpExp:
@@ -130,14 +130,24 @@ class ExpExp:
         header, data = csv_into_array(filename)
         for i in range(len(self.equation)):
             data[:, i] = self.equation[i].calculate(data[:, i])
-        np.savetxt("converted_" + filename, data, delimiter=", ", header=header)
+        np.savetxt("converted_" + filename, data, delimiter=", ", header=str(header))
 
 
 class DeepLearning:
     def __init__(self, data_filename, label_filename):
-        self.bathc_size = 128
+        self.batch_size = 128
         self.epoch = 10
         self.device = "/gpu:0"
+        self.optimizer = "adam"
+        self.loss = "mean_squared_error"
+        # self.loss = "mean_absolute_error"
+        # self.loss = "mean_absolute_percentage_error"
+        # self.loss = "mean_squared_logarithmic_error"
+
+        self.metrics = ["mean_squared_error"]
+        # self.metrics = ["mean_absolute_error"]
+        # self.metrics = ["mean_absolute_percentage_error"]
+        # self.metrics = ["mean_squared_logarithmic_error"]
 
         self.data_header, self.data = csv_into_array(data_filename)
         self.label_header, self.label = csv_into_array(label_filename)
@@ -195,7 +205,7 @@ class DeepLearning:
             model.add(layers.BatchNormalization())
             model.add(layers.Dense(20, activation="relu"))
             model.add(layers.BatchNormalization())
-            model.add(layers.Dense(self.Y_size, activation="sigmoid"))
+            model.add(layers.Dense(self.label_size, activation="sigmoid"))
             model.compile(optimizer=self.optimizer,
                           loss=self.loss,
                           metrics=self.metrics)
@@ -206,4 +216,4 @@ class DeepLearning:
     def volt_to_concentration(self, filename):
         header, data = csv_into_array(filename)
         result = self.Graph.predict(data, batch_size=self.batch_size)
-        np.savetxt("converted_" + filename, result, delimiter=", ", header=header)
+        np.savetxt("converted_" + filename, result, delimiter=", ", header=str(header))
