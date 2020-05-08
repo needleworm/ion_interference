@@ -6,7 +6,7 @@ Machine Learning Approach to Remove Ion Interference Effect
 
 # Overview
 This repository provides a machine learning approach to remove ion interference effect on ISE(ion selective electrodes).
-It's main purpose is to presents the readjustment function from citation [1].
+It's main purpose is to presents the readjustment function from reference [1].
 
 ![equation](https://latex.codecogs.com/gif.latex?C_%7Br%7D%20%3D%20%5Cmu%20%28TDS%29%20%5Ctimes%20C_%7BISE%7D)
 
@@ -16,36 +16,68 @@ The scripts regress on the equation below:
 
 Then the predicted function u performs ion-interference effect removal.
 
-# How to use
-## Dependencies
+Also, it provides calibration tool for ion sensors.
+
+# Input Data file format
+ A csv file with 2 columns.
+ 
+ \<X>, \<Y>
+ 
+ For calibration, X should be measured voltage and Y should be theoretical concentration.
+ 
+ For ion interference effect removal, X should be experimental concentration and Y should be theoretical concentration.
+ 
+ For refinement of data after training, please feed a one-column file, whose rows contain single value each.
+ 
+
+# 1. Dependencies
 > pip install numpy scipy tensorflow
 
-## Linear model
-> from Readjust import linear as L
+# 2. Calibration
+input : voltage
 
-> model = Q.model(filename)
+output : concentration
 
-> equation = Q.equation
+>from ion_preprocessing import calibration as IC
 
-> readjusted_value = Q.readjust(raw_value)
+### (1) Exponential model from Theory
+> cali_model = IC.Exp(filename)
+
+### (2) Double Exponential model from reference [1]
+> cali_model = IC.ExpExp(filename)
+
+### (3) Deep Learning model from reference [2]
+> cali_model = IC.DeepLearning(filename)
+
+### (4) Usage
+
+> equation = cali_model.equation
+
+> readjusted_value = cali_model.readjust(raw_value)
+
+> cali_model.volt_to_concentration(volt_file_filename)
+
+# 3. Remove Ion Interference Effect
+input : concentration
+
+output : concentration
 
 
-## Quadratic model from citation [1]
-> from Readjust import quadratic as Q
+>from ion_preprocessing import readjustment as IR
 
-> model = Q.model(filename)
+### (1) Linear model
+> model = IR.Linear(filenamem)
 
-> equation = Q.equation
+### (2) Quadratic model from reference [1]
+> model = IR.Quadratic(filename)
 
-> readjusted_value = Q.readjust(raw_value)
+### (3) Deep learning model from citation [2]
+> model = IR.DeepLearning(filename)
 
-## Deep learning model from citation [2]
-> from Readjust import linear as L
+### (4) Usage
 
-> model = Q.model(filename)
+> equation = model.equation
 
-> equation = Q.equation
+> readjusted_value = model.readjust(raw_value)
 
-> readjusted_value = Q.readjust(raw_value)
-
-
+> model.refine_concentration(concentration_file_filename)
