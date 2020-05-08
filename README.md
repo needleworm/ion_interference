@@ -19,9 +19,7 @@ Then the predicted function u performs ion-interference effect removal.
 Also, it provides calibration tool for ion sensors.
 
 # Input Data file format
- A csv file with 2 columns.
- 
- \<X>, \<Y>
+ 2 csv files. One contains X, the other contains Y. The first line is removed during parsing. Please do not write data here. The first row is prepared for the header.
  
  For calibration, X should be measured voltage and Y should be theoretical concentration.
  
@@ -41,13 +39,13 @@ output : concentration
 >from ion_preprocessing import calibration as IC
 
 ### (1) Exponential model from Theory
-> cali_model = IC.Exp(filename)
+> cali_model = IC.Exp(data_filename, label_filename)
 
 ### (2) Double Exponential model from reference [1]
-> cali_model = IC.ExpExp(filename)
+> cali_model = IC.ExpExp(data_filename, label_filename)
 
 ### (3) Deep Learning model from reference [2]
-> cali_model = IC.DeepLearning(filename)
+> cali_model = IC.DeepLearning(data_filename, label_filename)
 
 ### (4) Usage
 
@@ -66,13 +64,13 @@ output : concentration
 >from ion_preprocessing import readjustment as IR
 
 ### (1) Linear model
-> model = IR.Linear(filenamem)
+> model = IR.Linear(data_filename, label_filename)
 
 ### (2) Quadratic model from reference [1]
-> model = IR.Quadratic(filename)
+> model = IR.Quadratic(data_filename, label_filename)
 
 ### (3) Deep learning model from citation [2]
-> model = IR.DeepLearning(filename)
+> model = IR.DeepLearning(data_filename, label_filename)
 
 ### (4) Usage
 
