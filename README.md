@@ -10,9 +10,11 @@ It's main purpose is to presents the readjustment function from citation [1].
 
 ![equation](https://latex.codecogs.com/gif.latex?C_%7Br%7D%20%3D%20%5Cmu%20%28TDS%29%20%5Ctimes%20C_%7BISE%7D)
 
+The scripts regress on the equation below:
 
 ![equation](https://latex.codecogs.com/gif.latex?%5Cmu%20%28TDS%29%20%5Capprox%20%5Cfrac%7BC_%7Br%7D%7D%7BC_%7BISE%7D%7D)
 
+Then the predicted function u performs ion-interference effect removal.
 
 # How to use
 ## Dependencies
