@@ -179,7 +179,8 @@ class DeepLearning:
         print("** test acc is : " + str(self.test_acc))
 
         print("** Training Done **")
-        print(self.Graph.summary())
+        self.equation = self.Graph.summary()
+        print(self.equation)
 
         self.Graph.save(self.log_dir + "/saved_model.h5")
 

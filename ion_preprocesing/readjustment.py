@@ -175,7 +175,9 @@ class DeepLearning:
         print("** test acc is : " + str(self.test_acc))
 
         print("** Training Done **")
-        print(self.Graph.summary())
+
+        self.equation = self.Graph.summary()
+        print(self.equation)
 
         self.Graph.save(self.log_dir + "/saved_model.h5")
 
@@ -198,7 +200,7 @@ class DeepLearning:
             model = keras.models.load_model(logdir + "/saved_model.h5")
         return model
 
-    def volt_to_concentration(self, filename):
+    def refine_concentration(self, filename):
         header, data = csv_into_array(filename)
         result = self.Graph.predict(data, batch_size=self.batch_size)
         np.savetxt("converted_" + filename, result, delimiter=", ", header=header)
