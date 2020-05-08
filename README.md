@@ -45,7 +45,7 @@ output : concentration
 > cali_model = IC.ExpExp(data_filename, label_filename)
 
 ### (3) Deep Learning model from reference [2]
-> cali_model = IC.DeepLearning(data_filename, label_filename)
+> cali_model = IC.DeepLearning(X_size, Y_size, loss, optimizer, metrics, reset, logdir)
 
 ### (4) Usage
 
@@ -70,7 +70,7 @@ output : concentration
 > model = IR.Quadratic(data_filename, label_filename)
 
 ### (3) Deep learning model from citation [2]
-> model = IR.DeepLearning(data_filename, label_filename)
+> model = IR.DeepLearning(X_size, Y_size, loss, optimizer, metrics, reset, logdir)
 
 ### (4) Usage
 
