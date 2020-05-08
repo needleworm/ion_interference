@@ -5,7 +5,6 @@
   http://sangsang.farm
 """
 import numpy as np
-from scipy import stats
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -62,30 +61,21 @@ class Exp:
 
         self.slopes = []
         self.intercepts = []
-        self.r_values = []
-        self.p_values = []
-        self.std_errs = []
 
         self.regression(np.exp(self.data), self.label) # x는 exp 씌우고 y는 그대로
         self.equation = make_equation("exp", self.slopes, self.intercepts)
 
     def regression(self, data, label):
         for i in range(len(self.data_category)):
-            slope, intercept, r_value, p_value, std_err = stats.linregress(data[:, i], label[:, i])
-            self.slopes.append(slope)
-            self.intercepts.append(intercept)
-            self.r_values.append(r_value)
-            self.p_values.append(p_value)
-            self.std_errs.append(std_err)
+            regression_result = np.polyfit(data[:, i], label[:, i])
+            self.slopes.append(regression_result[0])
+            self.intercepts.append(regression_result[1])
 
         report = "Regression Result\n"
         for i in range(len(self.slopes)):
             report += "Regression number " + str(i + 1) + ".\n"
             report += "Slope : " + str(self.slopes[i]) + "\n"
-            report += "Intercept : " + str(self.intercepts[i]) + "\n"
-            report += "R Value : " + str(self.r_values[i]) + "\n"
-            report += "P Value : " + str(self.p_values[i]) + "\n"
-            report += "Std Error : " + str(self.std_errs[i]) + "\n\n\n"
+            report += "Intercept : " + str(self.intercepts[i]) + "\n\n\n"
 
         report_file = open("Report_" + str(time.time()) + ".txt", "w")
         report_file.write(report)
@@ -120,22 +110,16 @@ class ExpExp:
         self.equation = make_equation("expexp", self.slopes, self.intercepts)
 
     def regression(self, data, label):
-        for i in range(self.data_category):
-            slope, intercept, r_value, p_value, std_err = stats.linregress(data[:, i], label[:, i])
-            self.slopes.append(slope)
-            self.intercepts.append(intercept)
-            self.r_values.append(r_value)
-            self.p_values.append(p_value)
-            self.std_errs.append(std_err)
+        for i in range(len(self.data_category)):
+            regression_result = np.polyfit(data[:, i], label[:, i])
+            self.slopes.append(regression_result[0])
+            self.intercepts.append(regression_result[1])
 
         report = "Regression Result\n"
         for i in range(len(self.slopes)):
             report += "Regression number " + str(i + 1) + ".\n"
             report += "Slope : " + str(self.slopes[i]) + "\n"
-            report += "Intercept : " + str(self.intercepts[i]) + "\n"
-            report += "R Value : " + str(self.r_values[i]) + "\n"
-            report += "P Value : " + str(self.p_values[i]) + "\n"
-            report += "Std Error : " + str(self.std_errs[i]) + "\n\n\n"
+            report += "Intercept : " + str(self.intercepts[i]) + "\n\n\n"
 
         report_file = open("Report_" + str(time.time()) + ".txt", "w")
         report_file.write(report)
