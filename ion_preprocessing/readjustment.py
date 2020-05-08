@@ -21,6 +21,18 @@ def csv_into_array(filename):
     return header, data
 
 
+def R2_loss(y_true, y_pred):
+    SS_res =  keras.backend.sum(keras.backend.square(y_true - y_pred))
+    SS_tot = keras.backend.sum(keras.backend.square(y_true - keras.backend.mean(y_true)))
+    return ( -1 + SS_res/(SS_tot + keras.backend.epsilon()) )
+
+
+def R2(y_true, y_pred):
+    SS_res =  keras.backend.sum(keras.backend.square(y_true - y_pred))
+    SS_tot = keras.backend.sum(keras.backend.square(y_true - keras.backend.mean(y_true)))
+    return ( 1 - SS_res/(SS_tot + keras.backend.epsilon()) )
+
+
 def make_equation(function, slopes, intercepts):
     equations = []
     for i in range(len(slopes)):
@@ -131,16 +143,17 @@ class Quadratic:
 
 class DeepLearning:
     def __init__(self, data_filename, label_filename):
-        self.batch_size = 128
-        self.epoch = 10
+        self.batch_size = 64
+        self.epoch = 50
         self.device = "/gpu:0"
         self.optimizer = "adam"
-        self.loss = "mean_squared_error"
+        # self.loss = "mean_squared_error"
         # self.loss = "mean_absolute_error"
         # self.loss = "mean_absolute_percentage_error"
-        # self.loss = "mean_squared_logarithmic_error"
+        self.loss = R2_loss
 
-        self.metrics = ["mean_squared_error"]
+        self.metrics = [R2]
+        # self.metrics = ["accuracy"]
         # self.metrics = ["mean_absolute_error"]
         # self.metrics = ["mean_absolute_percentage_error"]
         # self.metrics = ["mean_squared_logarithmic_error"]
@@ -151,11 +164,11 @@ class DeepLearning:
         self.data_length, self.data_size = self.data.shape
         self.label_length, self.label_size = self.label.shape
 
-        if self.data.length != self.label.length:
+        if self.data_length != self.label_length:
             print("The data and label has different length.")
             exit(1)
 
-        self.log_dir = str(time.time) + "_log"
+        self.log_dir = str(time.time()) + "_log"
 
         self.division_x = np.max(self.data)
         self.division_y = np.max(self.label)
@@ -166,7 +179,7 @@ class DeepLearning:
         self.test_data = self.data[: int(self.data_length / 5)]
         self.train_data = self.data[int(self.data_length / 5):]
 
-        self.test_label = self.label[:int(self.label_length/ 5)]
+        self.test_label = self.label[:int(self.label_length / 5)]
         self.train_label = self.label[int(self.label_length / 5):]
 
         self.tensorboard = keras.callbacks.TensorBoard(log_dir=self.log_dir + "/{}".format(time.time()))
@@ -175,33 +188,32 @@ class DeepLearning:
             self.Graph = self.graph(True, self.log_dir)
 
         self.Graph.fit(self.train_data, self.train_label,
-                       epoch=self.epoch,
+                       epochs=self.epoch,
                        batch_size=self.batch_size,
                        callbacks=[self.tensorboard],
                        validation_data=(self.test_data, self.test_label))
 
         self.test_loss, self.test_acc = self.Graph.evaluate(self.test_data, self.test_label)
         print("** test loss is : " + str(self.test_loss))
-        print("** test acc is : " + str(self.test_acc))
+        print("** test Metric is : " + str(self.test_acc))
 
         print("** Training Done **")
         self.equation = self.Graph.summary()
-        print(self.equation)
 
         self.Graph.save(self.log_dir + "/saved_model.h5")
 
     def graph(self, reset, logdir):
         if reset:
             model = tf.keras.Sequential()
-            model.add(layers.Dense(60, activation="relu"))
+            model.add(layers.Dense(128, activation="relu"))
             model.add(layers.BatchNormalization())
-            model.add(layers.Dense(60, activation="relu"))
+            model.add(layers.Dense(128, activation="relu"))
             model.add(layers.BatchNormalization())
-            model.add(layers.Dense(30, activation="relu"))
+            model.add(layers.Dense(128, activation="relu"))
             model.add(layers.BatchNormalization())
-            model.add(layers.Dense(20, activation="relu"))
+            model.add(layers.Dense(128, activation="relu"))
             model.add(layers.BatchNormalization())
-            model.add(layers.Dense(self.label_size, activation="sigmoid"))
+            model.add(layers.Dense(self.label_size, activation="relu"))
             model.compile(optimizer=self.optimizer,
                           loss=self.loss,
                           metrics=self.metrics)
