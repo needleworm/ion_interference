@@ -79,3 +79,11 @@ output : concentration
 > readjusted_value = model.readjust(raw_value)
 
 > model.refine_concentration(concentration_file_filename)
+
+# 4 Comments on Deep learning
+When you run the deep learning method, a log directory will appear on your working directory.
+During training, the best result will be continuously saved in the log directory.
+
+It runs 100 epoch of training at first. And during the training process, the module detects 'Which epoch showed the best test result'.
+
+The the best fitting weights and conversion result is saved. 
