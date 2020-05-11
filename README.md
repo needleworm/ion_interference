@@ -45,7 +45,7 @@ output : concentration
 > cali_model = IC.ExpExp(data_filename, label_filename)
 
 ### (3) Deep Learning model from reference [2]
-> cali_model = IC.DeepLearning(X_size, Y_size, loss, optimizer, metrics, reset, logdir)
+> cali_model = IC.DeepLearning(data_filename, label_filename)
 
 ### (4) Usage
 
@@ -70,7 +70,7 @@ output : concentration
 > model = IR.Quadratic(data_filename, label_filename)
 
 ### (3) Deep learning model from citation [2]
-> model = IR.DeepLearning(X_size, Y_size, loss, optimizer, metrics, reset, logdir)
+> model = IR.DeepLearning(data_filename, label_filename)
 
 ### (4) Usage
 
@@ -86,4 +86,14 @@ During training, the best result will be continuously saved in the log directory
 
 It runs 100 epoch of training at first. And during the training process, the module detects 'Which epoch showed the best test result'.
 
-The the best fitting weights and conversion result is saved. 
+The the best fitting weights and conversion result is saved.
+
+## To load weight
+Load the class with weight name specified.
+
+> model = IR.DeepLearning(data_filename, label_filename, weight_filename)
+  
+> model = IC.DeepLearning(data_filename, label_filename, weight_filename)
+
+
+The weight used on the reference [2] is attached.
