@@ -143,14 +143,17 @@ class Quadratic:
 
 class DeepLearning:
     def __init__(self, data_filename, label_filename):
-        self.batch_size = 64
-        self.epoch = 50
+        self.batch_size = 32
+        self.epoch = 100
         self.device = "/gpu:0"
         self.optimizer = "adam"
         # self.loss = "mean_squared_error"
         # self.loss = "mean_absolute_error"
         # self.loss = "mean_absolute_percentage_error"
         self.loss = R2_loss
+        self.test_acc = 0
+
+        self.infile_name = data_filename
 
         self.metrics = [R2]
         # self.metrics = ["accuracy"]
@@ -187,8 +190,11 @@ class DeepLearning:
         with tf.device(self.device):
             self.Graph = self.graph(True, self.log_dir)
 
+        self.train_saving_results(self.epoch)
+
+    def train(self, epoch):
         self.Graph.fit(self.train_data, self.train_label,
-                       epochs=self.epoch,
+                       epochs=epoch,
                        batch_size=self.batch_size,
                        callbacks=[self.tensorboard],
                        validation_data=(self.test_data, self.test_label))
@@ -201,6 +207,19 @@ class DeepLearning:
         self.equation = self.Graph.summary()
 
         self.Graph.save(self.log_dir + "/saved_model.h5")
+
+    def train_saving_results(self, epoch):
+        for i in range(epoch):
+            self.Graph.fit(self.train_data, self.train_label,
+                           epochs=1,
+                           batch_size=self.batch_size,
+                           callbacks=[self.tensorboard],
+                           validation_data=(self.test_data, self.test_label))
+            test_loss, test_acc = self.Graph.evaluate(self.test_data, self.test_label)
+            if test_acc > self.test_acc:
+                self.test_acc = test_acc
+                self.volt_to_concentration_during_training(self.log_dir + "/" + str(self.test_acc) + ".csv")
+                self.Graph.save(self.log_dir + "/saved_model.h5")
 
     def graph(self, reset, logdir):
         if reset:
@@ -225,3 +244,8 @@ class DeepLearning:
         header, data = csv_into_array(filename)
         result = self.Graph.predict(data, batch_size=self.batch_size)
         np.savetxt("converted_" + filename, result, delimiter=", ", header=str(header))
+
+    def volt_to_concentration_during_training(self, filename):
+        header, data = csv_into_array(self.infile_name)
+        result = self.Graph.predict(data, batch_size=self.batch_size)
+        np.savetxt(filename, result, delimiter=", ", header=str(header))
