@@ -9,6 +9,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import time
+from tensorflow.keras.models import load_model
 
 
 def csv_into_array(filename):
@@ -19,6 +20,14 @@ def csv_into_array(filename):
     if len(header) == 1:
         data = data.reshape((len(data), 1))
     return header, data
+
+
+def myloss_1(y_true, y_pred):
+    return keras.backend.sum(keras.backend.abs())
+
+
+def myloss_2(y_true, y_pred):
+    return keras.backend.sum(keras.backend.square((y_true - y_pred)/y_true))
 
 
 def R2_loss(y_true, y_pred):
@@ -142,20 +151,23 @@ class Quadratic:
 
 
 class DeepLearning:
-    def __init__(self, data_filename, label_filename):
-        self.batch_size = 32
-        self.epoch = 100
+    def __init__(self, data_filename, label_filename, weight=""):
+        self.batch_size = 64
+        self.epoch = 500
         self.device = "/gpu:0"
-        self.optimizer = "adam"
+        self.optimizer = keras.optimizers.Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=None, decay=1e-7, amsgrad=False)
         # self.loss = "mean_squared_error"
         # self.loss = "mean_absolute_error"
-        # self.loss = "mean_absolute_percentage_error"
-        self.loss = R2_loss
-        self.test_acc = 0
+        # self.loss = R2_loss
+        self.loss = tf.keras.losses.MeanAbsolutePercentageError()
+        # self.loss = tf.keras.losses.MeanSquaredLogarithmicError()
+        # self.loss = myloss_2
+        self.test_acc = 100
 
         self.infile_name = data_filename
 
-        self.metrics = [R2]
+        self.metrics = ["mean_absolute_percentage_error"]
+        # self.metrics = [R2]
         # self.metrics = ["accuracy"]
         # self.metrics = ["mean_absolute_error"]
         # self.metrics = ["mean_absolute_percentage_error"]
@@ -188,9 +200,13 @@ class DeepLearning:
         self.tensorboard = keras.callbacks.TensorBoard(log_dir=self.log_dir + "/{}".format(time.time()))
 
         with tf.device(self.device):
-            self.Graph = self.graph(True, self.log_dir)
+            if weight:
+                self.Graph = load_model(weight)
+            else:
+                self.Graph = self.graph(True, self.log_dir)
 
-        self.train_saving_results(self.epoch)
+        if not weight:
+            self.train_saving_results(self.epoch)
 
     def train(self, epoch):
         self.Graph.fit(self.train_data, self.train_label,
@@ -210,13 +226,16 @@ class DeepLearning:
 
     def train_saving_results(self, epoch):
         for i in range(epoch):
+            print ("\n\n\nEPOCH NUMBER " + str(i))
             self.Graph.fit(self.train_data, self.train_label,
                            epochs=1,
                            batch_size=self.batch_size,
                            callbacks=[self.tensorboard],
-                           validation_data=(self.test_data, self.test_label))
+                           validation_data=(self.test_data, self.test_label),
+                           verbose=2)
             test_loss, test_acc = self.Graph.evaluate(self.test_data, self.test_label)
-            if test_acc > self.test_acc:
+            print("test loss " + str(test_loss))
+            if test_acc < self.test_acc:
                 self.test_acc = test_acc
                 self.volt_to_concentration_during_training(self.log_dir + "/" + str(self.test_acc) + ".csv")
                 self.Graph.save(self.log_dir + "/saved_model.h5")
@@ -224,10 +243,42 @@ class DeepLearning:
     def graph(self, reset, logdir):
         if reset:
             model = tf.keras.Sequential()
+            model.add(layers.Dense(256, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(256, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(256, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(256, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="sigmoid"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
+    def graph2(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
             model.add(layers.Dense(128, activation="relu"))
             model.add(layers.BatchNormalization())
             model.add(layers.Dense(128, activation="relu"))
             model.add(layers.BatchNormalization())
+            model.add(layers.Dense(128, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="sigmoid"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
+    def graph3(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
             model.add(layers.Dense(128, activation="relu"))
             model.add(layers.BatchNormalization())
             model.add(layers.Dense(128, activation="relu"))
@@ -240,12 +291,118 @@ class DeepLearning:
             model = keras.models.load_model(logdir + "/saved_model.h5")
         return model
 
+    def graph4(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="relu"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
+    def graph5(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="relu"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
+    def graph6(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(64, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="relu"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
+    def graph7(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="relu"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
+    def graph8(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="relu"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
+    def graph9(self, reset, logdir):
+        if reset:
+            model = tf.keras.Sequential()
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(32, activation="relu"))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Dense(self.label_size, activation="relu"))
+            model.compile(optimizer=self.optimizer,
+                          loss=self.loss,
+                          metrics=self.metrics)
+        else:
+            model = keras.models.load_model(logdir + "/saved_model.h5")
+        return model
+
     def volt_to_concentration(self, filename):
         header, data = csv_into_array(filename)
+        data /= self.division_x
         result = self.Graph.predict(data, batch_size=self.batch_size)
-        np.savetxt("converted_" + filename, result, delimiter=", ", header=str(header))
+        result *= self.division_y
+        np.savetxt("converted_" + filename, result, delimiter=", ", header=str(header)[1:-1])
 
     def volt_to_concentration_during_training(self, filename):
         header, data = csv_into_array(self.infile_name)
+        data /= self.division_x
         result = self.Graph.predict(data, batch_size=self.batch_size)
-        np.savetxt(filename, result, delimiter=", ", header=str(header))
+        result *= self.division_y
+        np.savetxt(filename, result, delimiter=", ", header=str(header)[1:-1])
