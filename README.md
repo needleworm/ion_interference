@@ -4,6 +4,10 @@ Machine Learning Approach to Remove Ion Interference Effect
 # Citation
 [1] B. Ban, D. Ryu and M. Lee, "Machine Learning Approach to Remove Ion Interference Effect in Agricultural Nutrient Solutions," 2019 International Conference on Information and Communication Technology Convergence (ICTC), Jeju Island, Korea (South), 2019, pp. 1156-1161, doi: 10.1109/ICTC46691.2019.8939812.
 
+[2] Ban, Byunghyun. "Pan-artifact Removing with Deep Learning, on ISEs." arXiv preprint arXiv:2005.13400 (2020).
+
+Please cite both papers.
+
 # Overview
 This repository provides a machine learning approach to remove ion interference effect on ISE(ion selective electrodes).
 It's main purpose is to presents the readjustment function from reference [1].
