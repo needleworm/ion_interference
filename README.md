@@ -4,7 +4,7 @@ Machine Learning Approach to Remove Ion Interference Effect
 # Citation
 [1] B. Ban, D. Ryu and M. Lee, "Machine Learning Approach to Remove Ion Interference Effect in Agricultural Nutrient Solutions," 2019 International Conference on Information and Communication Technology Convergence (ICTC), Jeju Island, Korea (South), 2019, pp. 1156-1161, doi: 10.1109/ICTC46691.2019.8939812.
 
-[2] Ban, B.; Ryu, D.; Lee, M. Deep Learning Method to Remove Chemical, Kinetic and Electric Artifacts on ISEs. Preprints 2020, 2020050381 (doi: 10.20944/preprints202005.0381.v2).
+[2] Ban, Byunghyun. "Deep learning method to remove chemical, kinetic and electric artifacts on ISEs." 2020 International Conference on Information and Communication Technology Convergence (ICTC). IEEE, 2020.
 
 Please cite both papers.
 
