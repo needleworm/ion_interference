@@ -7,7 +7,7 @@ Chemical Complex System Simulator for Ion Interaction Environment
 # Citation
 [1] B. Ban, D. Ryu and M. Lee, "[Machine Learning Approach to Remove Ion Interference Effect in Agricultural Nutrient Solutions](https://arxiv.org/abs/1907.10794)" 2019 International Conference on Information and Communication Technology Convergence (ICTC), Jeju Island, Korea (South), 2019, pp. 1156-1161, doi: 10.1109/ICTC46691.2019.8939812.
 
-[2] Ban, Byunghyun. "Deep learning method to remove chemical, kinetic and electric artifacts on ISEs." 2020 International Conference on Information and Communication Technology Convergence (ICTC). IEEE, 2020.
+[2] Ban, Byunghyun. "[Deep learning method to remove chemical, kinetic and electric artifacts on ISEs.](https://arxiv.org/abs/2005.13400)" 2020 International Conference on Information and Communication Technology Convergence (ICTC). IEEE, 2020.
 
 Please cite both papers.
 
